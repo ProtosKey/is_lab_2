@@ -3,9 +3,13 @@ package dev.protoskey.validator;
 import dev.protoskey.exception.ValidatorException;
 import dev.protoskey.model.HumanRef;
 import dev.protoskey.model.HumanRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
+@ApplicationScoped
 public class HumanRefValidator implements Validator<HumanRef> {
-    private final HumanRequestValidator humanValidator = new HumanRequestValidator();
+    @Inject
+    private HumanRequestValidator humanValidator;
 
     @Override
     public void validate(HumanRef ref) throws ValidatorException {

@@ -2,12 +2,14 @@ package dev.protoskey.validator;
 
 import dev.protoskey.exception.ValidatorException;
 import dev.protoskey.model.HumanRequest;
-import java.time.LocalDateTime;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+@ApplicationScoped
 public class HumanRequestValidator implements Validator<HumanRequest> {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     public void validate(HumanRequest request) throws ValidatorException {
@@ -37,12 +39,12 @@ public class HumanRequestValidator implements Validator<HumanRequest> {
     public void validateBirthday(String birthday) throws ValidatorException {
         if (birthday == null || birthday.isBlank()) return;
         try {
-            LocalDateTime dateTime = LocalDateTime.parse(birthday, FORMATTER);
-            if (dateTime.isAfter(LocalDateTime.now())) {
+            LocalDate date = LocalDate.parse(birthday, FORMATTER);
+            if (date.isAfter(LocalDate.now())) {
                 throw new ValidatorException("Дата рождения не может быть в будущем");
             }
         } catch (DateTimeParseException e) {
-            throw new ValidatorException("Неверный формат даты рождения. Ожидается формат yyyy-MM-dd'T'HH:mm:ss");
+            throw new ValidatorException("Неверный формат даты рождения. Ожидается формат yyyy-MM-dd");
         }
     }
 }

@@ -4,16 +4,21 @@ import dev.protoskey.entity.Climate;
 import dev.protoskey.entity.StandardOfLiving;
 import dev.protoskey.exception.ValidatorException;
 import dev.protoskey.model.CityRequest;
-import java.time.ZonedDateTime;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@ApplicationScoped
 public class CityRequestValidator implements Validator<CityRequest> {
-    private static final DateTimeFormatter ZONED_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
-    private final CoordinatesRefValidator coordinatesValidator = new CoordinatesRefValidator();
-    private final HumanRefValidator humanValidator = new HumanRefValidator();
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    @Inject
+    private CoordinatesRefValidator coordinatesValidator;
+    @Inject
+    private HumanRefValidator humanValidator;
 
     @Override
     public void validate(CityRequest request) throws ValidatorException {
@@ -60,12 +65,12 @@ public class CityRequestValidator implements Validator<CityRequest> {
     public void validateEstablishmentDate(String establishmentDate) throws ValidatorException {
         if (establishmentDate == null || establishmentDate.isBlank()) return;
         try {
-            ZonedDateTime dateTime = ZonedDateTime.parse(establishmentDate, ZONED_DATE_TIME_FORMATTER);
-            if (dateTime.isAfter(ZonedDateTime.now())) {
+            LocalDate date = LocalDate.parse(establishmentDate, FORMATTER);
+            if (date.isAfter(LocalDate.now())) {
                 throw new ValidatorException("Дата основания не может быть в будущем");
             }
         } catch (DateTimeParseException e) {
-            throw new ValidatorException("Неверный формат даты основания. Ожидается формат yyyy-MM-dd'T'HH:mm:ssXXX");
+            throw new ValidatorException("Неверный формат даты основания. Ожидается формат yyyy-MM-dd");
         }
     }
 
@@ -75,10 +80,6 @@ public class CityRequestValidator implements Validator<CityRequest> {
         }
     }
 
-    /**
-     * Поле может быть null, ограничений предметной области для него нет —
-     * достаточно того, что значение успешно распарсилось во Float.
-     */
     public void validateMetersAboveSeaLevel(Float metersAboveSeaLevel) throws ValidatorException {
     }
 

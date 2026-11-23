@@ -2,7 +2,9 @@ package dev.protoskey.validator;
 
 import dev.protoskey.exception.ValidatorException;
 import dev.protoskey.model.CoordinatesRequest;
+import jakarta.enterprise.context.ApplicationScoped;
 
+@ApplicationScoped
 public class CoordinatesRequestValidator implements Validator<CoordinatesRequest> {
     private static final int MAX_VALUE = 974;
 

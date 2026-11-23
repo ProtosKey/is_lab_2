@@ -2,9 +2,14 @@ package dev.protoskey.validator;
 
 import dev.protoskey.exception.ValidatorException;
 import dev.protoskey.model.CoordinatesRef;
+import dev.protoskey.model.CoordinatesRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
+@ApplicationScoped
 public class CoordinatesRefValidator implements Validator<CoordinatesRef> {
-    private final CoordinatesRequestValidator coordinatesValidator = new CoordinatesRequestValidator();
+    @Inject
+    private CoordinatesRequestValidator coordinatesValidator;
 
     @Override
     public void validate(CoordinatesRef ref) throws ValidatorException {
@@ -15,8 +20,10 @@ public class CoordinatesRefValidator implements Validator<CoordinatesRef> {
             validateId(ref.getId());
             return;
         }
-        coordinatesValidator.validateX(ref.getX());
-        coordinatesValidator.validateY(ref.getY());
+        CoordinatesRequest request = new CoordinatesRequest();
+        request.setX(ref.getX());
+        request.setY(ref.getY());
+        coordinatesValidator.validate(request);
     }
 
     public void validateId(Integer id) throws ValidatorException {

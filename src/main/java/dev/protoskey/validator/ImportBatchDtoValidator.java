@@ -2,12 +2,19 @@ package dev.protoskey.validator;
 
 import dev.protoskey.exception.ValidatorException;
 import dev.protoskey.model.ImportBatchDto;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import java.util.List;
 
+@ApplicationScoped
 public class ImportBatchDtoValidator implements Validator<ImportBatchDto> {
-    private final CoordinatesRequestValidator coordinatesValidator = new CoordinatesRequestValidator();
-    private final HumanRequestValidator humanValidator = new HumanRequestValidator();
-    private final ImportCityDtoValidator cityValidator = new ImportCityDtoValidator();
+    @Inject
+    private CoordinatesRequestValidator coordinatesValidator;
+    @Inject
+    private HumanRequestValidator humanValidator;
+    @Inject
+    private ImportCityDtoValidator cityValidator;
 
     @Override
     public void validate(ImportBatchDto batch) throws ValidatorException {
