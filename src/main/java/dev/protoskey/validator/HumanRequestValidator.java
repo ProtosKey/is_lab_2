@@ -1,22 +1,22 @@
 package dev.protoskey.validator;
 
 import dev.protoskey.exception.ValidatorException;
-import dev.protoskey.model.HumanDto;
+import dev.protoskey.model.HumanRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-public class HumanDtoValidator implements Validator<HumanDto> {
+public class HumanRequestValidator implements Validator<HumanRequest> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Override
-    public void validate(HumanDto dto) throws ValidatorException {
-        if (dto == null) {
+    public void validate(HumanRequest request) throws ValidatorException {
+        if (request == null) {
             throw new ValidatorException("Объект не может быть null");
         }
-        validateName(dto.getName());
-        validateAge(dto.getAge());
-        validateBirthday(dto.getBirthday());
+        validateName(request.getName());
+        validateAge(request.getAge());
+        validateBirthday(request.getBirthday());
     }
 
     public void validateName(String name) throws ValidatorException {

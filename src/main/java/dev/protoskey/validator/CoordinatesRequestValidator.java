@@ -1,18 +1,18 @@
 package dev.protoskey.validator;
 
 import dev.protoskey.exception.ValidatorException;
-import dev.protoskey.model.CoordinatesDto;
+import dev.protoskey.model.CoordinatesRequest;
 
-public class CoordinatesDtoValidator implements Validator<CoordinatesDto> {
+public class CoordinatesRequestValidator implements Validator<CoordinatesRequest> {
     private static final int MAX_VALUE = 974;
 
     @Override
-    public void validate(CoordinatesDto dto) throws ValidatorException {
-        if (dto == null) {
+    public void validate(CoordinatesRequest request) throws ValidatorException {
+        if (request == null) {
             throw new ValidatorException("Объект не может быть null");
         }
-        validateX(dto.getX());
-        validateY(dto.getY());
+        validateX(request.getX());
+        validateY(request.getY());
     }
 
     public void validateX(Integer x) throws ValidatorException {
@@ -20,7 +20,7 @@ public class CoordinatesDtoValidator implements Validator<CoordinatesDto> {
             throw new ValidatorException("Абсцисса не может быть пустой");
         }
         if (x > MAX_VALUE) {
-            throw new ValidatorException("Абсцисса не может быть больше 974");
+            throw new ValidatorException("Абсцисса не может быть больше " + MAX_VALUE);
         }
     }
 
