@@ -37,9 +37,10 @@
 
 ## Запуск
 
-Нужны Java 21, PostgreSQL и Payara, распакованный в папку `payara7/` в корне проекта.
+Нужны Java 21, Docker и Payara, распакованный в папку `payara7/` в корне проекта.
 
 ```sh
+docker-compose up -d
 ./gradlew build
 ./payara7/bin/asadmin start-domain
 ./payara7/bin/asadmin deploy --contextroot /is_lab_2 build/libs/city-system.war
