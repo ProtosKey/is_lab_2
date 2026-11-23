@@ -80,6 +80,10 @@ public class City {
     @JoinColumn(name = "governor_id", nullable = false)
     private Human governor;
 
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "created_by", nullable = false)
+    private User created_by;
+
     @PrePersist
     private void fillCreationDate() {
         creationDate = LocalDateTime.now();

@@ -1,11 +1,6 @@
 package dev.protoskey.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +23,10 @@ public class Coordinates {
 
     @Column(name = "y", nullable = false)
     private int y;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "created_by", nullable = false)
+    private User created_by;
 
     @Override
     public boolean equals(Object other) {
