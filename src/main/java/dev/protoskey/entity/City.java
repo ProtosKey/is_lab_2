@@ -85,7 +85,9 @@ public class City {
 
     @PrePersist
     private void fillCreationDate() {
-        creationDate = LocalDateTime.now();
+        if (creationDate == null) {
+            creationDate = LocalDateTime.now();
+        }
     }
 
     @Override
