@@ -48,7 +48,6 @@ public class City {
     @Column(name = "area", nullable = false, columnDefinition = "integer not null check (area > 0)")
     private Integer area;
 
-    @NotNull(message = "У города должно быть население")
     @Positive(message = "Население должно быть больше положительным")
     @Column(name = "population", nullable = false, columnDefinition = "integer not null check (population > 0)")
     private int population;
@@ -82,7 +81,7 @@ public class City {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
-    private User created_by;
+    private User createdBy;
 
     @PrePersist
     private void fillCreationDate() {

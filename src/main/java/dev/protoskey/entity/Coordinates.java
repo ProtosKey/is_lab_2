@@ -26,7 +26,7 @@ public class Coordinates {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
-    private User created_by;
+    private User createdBy;
 
     @Override
     public boolean equals(Object other) {
