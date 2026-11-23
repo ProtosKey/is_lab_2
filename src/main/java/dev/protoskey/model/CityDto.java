@@ -8,9 +8,7 @@ import lombok.Setter;
 public class CityDto {
     private Integer id;
     private String name;
-    private Integer coordinatesId;
-    private Integer coordinatesX;
-    private Integer coordinatesY;
+    private CoordinatesDto coordinates;
     private String creationDate;
     private Integer area;
     private Integer population;
@@ -20,8 +18,5 @@ public class CityDto {
     private Float populationDensity;
     private String climate;
     private String standardOfLiving;
-    private Integer governorId;
-    private String governorName;
-    private Long governorAge;
-    private String governorBirthday;
+    private HumanDto governor;
 }
