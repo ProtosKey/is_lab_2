@@ -3,8 +3,10 @@ package dev.protoskey.mapper;
 import dev.protoskey.entity.Coordinates;
 import dev.protoskey.exception.MapperException;
 import dev.protoskey.model.CoordinatesDto;
+import jakarta.enterprise.context.ApplicationScoped;
 
-public class CoordinatesMapper implements Mapper<Coordinates, CoordinatesDto> {
+@ApplicationScoped
+public class CoordinatesDtoMapper implements Mapper<Coordinates, CoordinatesDto> {
     @Override
     public CoordinatesDto parseFrom(Coordinates coordinates) throws MapperException {
         if (coordinates == null) {
