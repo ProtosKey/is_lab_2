@@ -26,6 +26,7 @@ public class CityRequestValidator implements Validator<CityRequest> {
             throw new ValidatorException("Объект не может быть null");
         }
         validateName(request.getName());
+        validateCreationDate(request.getCreationDate());
         validateArea(request.getArea());
         validatePopulation(request.getPopulation());
         validateEstablishmentDate(request.getEstablishmentDate());
@@ -41,6 +42,18 @@ public class CityRequestValidator implements Validator<CityRequest> {
     public void validateName(String name) throws ValidatorException {
         if (name == null || name.isBlank()) {
             throw new ValidatorException("Название города не может быть пустым");
+        }
+    }
+
+    public void validateCreationDate(String creationDate) throws ValidatorException {
+        if (creationDate == null || creationDate.isBlank()) return;
+        try {
+            LocalDate date = LocalDate.parse(creationDate, FORMATTER);
+            if (date.isAfter(LocalDate.now())) {
+                throw new ValidatorException("Дата создания не может быть в будущем");
+            }
+        } catch (DateTimeParseException e) {
+            throw new ValidatorException("Неверный формат даты создания. Ожидается формат yyyy-MM-dd");
         }
     }
 

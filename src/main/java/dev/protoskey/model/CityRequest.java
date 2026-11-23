@@ -8,6 +8,7 @@ import lombok.Setter;
 public class CityRequest {
     private String name;
     private CoordinatesRef coordinates;
+    private String creationDate;
     private Integer area;
     private Integer population;
     private String establishmentDate;
