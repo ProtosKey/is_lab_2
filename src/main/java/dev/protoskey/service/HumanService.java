@@ -41,6 +41,14 @@ public class HumanService {
         return humanRepository.findAll();
     }
 
+    public List<Human> findPage(int offset, int limit) {
+        return humanRepository.findPage(offset, limit);
+    }
+
+    public long count() {
+        return humanRepository.count();
+    }
+
     public Human find(Integer id) throws EntityNotFoundException {
         return humanRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Губернатор", id));

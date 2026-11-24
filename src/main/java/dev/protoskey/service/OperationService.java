@@ -49,4 +49,16 @@ public class OperationService {
                 ? operationRepository.findAll()
                 : operationRepository.findAllByUser(user.getId());
     }
+
+    public java.util.List<Operation> historyPageFor(User user, int offset, int limit) {
+        return user.getUserLevel() == dev.protoskey.entity.UserLevel.ADMIN
+                ? operationRepository.findPage(offset, limit)
+                : operationRepository.findPageByUser(user.getId(), offset, limit);
+    }
+
+    public long countFor(User user) {
+        return user.getUserLevel() == dev.protoskey.entity.UserLevel.ADMIN
+                ? operationRepository.countAll()
+                : operationRepository.countByUser(user.getId());
+    }
 }

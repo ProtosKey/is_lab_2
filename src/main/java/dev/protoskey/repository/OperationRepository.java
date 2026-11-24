@@ -32,6 +32,35 @@ public class OperationRepository implements Repository<Operation> {
                 .getResultList();
     }
 
+    public List<Operation> findPage(int offset, int limit) {
+        return entityManager.createQuery(
+                        "select o from Operation o order by o.createdAt desc, o.id desc", Operation.class)
+                .setFirstResult(Math.max(0, offset))
+                .setMaxResults(Math.max(1, limit))
+                .getResultList();
+    }
+
+    public List<Operation> findPageByUser(Integer userId, int offset, int limit) {
+        return entityManager.createQuery(
+                        "select o from Operation o where o.user.id = :userId order by o.createdAt desc, o.id desc",
+                        Operation.class)
+                .setParameter("userId", userId)
+                .setFirstResult(Math.max(0, offset))
+                .setMaxResults(Math.max(1, limit))
+                .getResultList();
+    }
+
+    public long countAll() {
+        return entityManager.createQuery("select count(o) from Operation o", Long.class)
+                .getSingleResult();
+    }
+
+    public long countByUser(Integer userId) {
+        return entityManager.createQuery("select count(o) from Operation o where o.user.id = :userId", Long.class)
+                .setParameter("userId", userId)
+                .getSingleResult();
+    }
+
     @Override
     public Operation save(Operation operation) {
         entityManager.persist(operation);

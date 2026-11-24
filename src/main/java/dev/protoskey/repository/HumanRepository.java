@@ -20,6 +20,18 @@ public class HumanRepository implements Repository<Human> {
         return entityManager.createQuery("select h from Human h order by h.id", Human.class).getResultList();
     }
 
+    public List<Human> findPage(int offset, int limit) {
+        return entityManager.createQuery("select h from Human h order by h.id", Human.class)
+                .setFirstResult(Math.max(0, offset))
+                .setMaxResults(Math.max(1, limit))
+                .getResultList();
+    }
+
+    public long count() {
+        return entityManager.createQuery("select count(h) from Human h", Long.class)
+                .getSingleResult();
+    }
+
     public Optional<Human> findByName(String name) {
         return entityManager.createQuery("select h from Human h where h.name = :name", Human.class)
                 .setParameter("name", name)

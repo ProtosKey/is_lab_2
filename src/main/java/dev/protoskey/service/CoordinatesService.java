@@ -41,6 +41,14 @@ public class CoordinatesService {
         return coordinatesRepository.findAll();
     }
 
+    public List<Coordinates> findPage(int offset, int limit) {
+        return coordinatesRepository.findPage(offset, limit);
+    }
+
+    public long count() {
+        return coordinatesRepository.count();
+    }
+
     public Coordinates find(Integer id) throws EntityNotFoundException {
         return coordinatesRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Координаты", id));
