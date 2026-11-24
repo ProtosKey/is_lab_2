@@ -26,8 +26,12 @@ public class CoordinatesRefMapper implements Mapper<Coordinates, CoordinatesRef>
         }
         Coordinates coordinates = new Coordinates();
         coordinates.setId(ref.getId());
-        coordinates.setX(ref.getX());
-        coordinates.setY(ref.getY());
+        if (ref.getX() != null) {
+            coordinates.setX(ref.getX());
+        }
+        if (ref.getY() != null) {
+            coordinates.setY(ref.getY());
+        }
         return coordinates;
     }
 }

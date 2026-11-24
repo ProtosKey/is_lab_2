@@ -36,7 +36,9 @@ public class HumanRefMapper implements Mapper<Human, HumanRef> {
         Human human = new Human();
         human.setId(ref.getId());
         human.setName(ref.getName());
-        human.setAge(ref.getAge());
+        if (ref.getAge() != null) {
+            human.setAge(ref.getAge());
+        }
         if (ref.getBirthday() != null && !ref.getBirthday().isEmpty()) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
