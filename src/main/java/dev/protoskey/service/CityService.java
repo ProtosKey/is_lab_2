@@ -5,6 +5,7 @@ import dev.protoskey.entity.User;
 import dev.protoskey.entity.UserLevel;
 import dev.protoskey.exception.AccessDeniedException;
 import dev.protoskey.exception.EntityNotFoundException;
+import dev.protoskey.exception.UniqueViolationException;
 import dev.protoskey.exception.ValidatorException;
 import dev.protoskey.exception.MapperException;
 import dev.protoskey.mapper.CityRequestMapper;
@@ -52,12 +53,16 @@ public class CityService {
 
     @Transactional(rollbackOn = Exception.class)
     public City create(CityRequest request, User user)
-            throws ValidatorException, EntityNotFoundException, MapperException {
+            throws ValidatorException, EntityNotFoundException, UniqueViolationException, MapperException {
         validator.validate(request);
 
         City city = mapper.parseTo(request);
-        city.setCoordinates(coordinatesService.resolve(request.getCoordinates(), user));
-        city.setGovernor(humanService.resolve(request.getGovernor(), user));
+        var coordinates = coordinatesService.resolve(request.getCoordinates(), user);
+        checkCoordinatesAvailable(coordinates.getId(), null);
+        var governor = humanService.resolve(request.getGovernor(), user);
+        checkGovernorAvailable(governor.getId(), null);
+        city.setCoordinates(coordinates);
+        city.setGovernor(governor);
         city.setCreatedBy(user);
         City saved = cityRepository.save(city);
         updateNotifier.notify("cities");
@@ -68,7 +73,7 @@ public class CityService {
 
     @Transactional(rollbackOn = Exception.class)
     public City update(Integer id, CityRequest request, User user)
-            throws ValidatorException, EntityNotFoundException, AccessDeniedException, MapperException {
+            throws ValidatorException, EntityNotFoundException, AccessDeniedException, UniqueViolationException, MapperException {
         validator.validate(request);
 
         City existing = find(id);
@@ -84,8 +89,12 @@ public class CityService {
         existing.setPopulationDensity(changes.getPopulationDensity());
         existing.setClimate(changes.getClimate());
         existing.setStandardOfLiving(changes.getStandardOfLiving());
-        existing.setCoordinates(coordinatesService.resolve(request.getCoordinates(), user));
-        existing.setGovernor(humanService.resolve(request.getGovernor(), user));
+        var coordinates = coordinatesService.resolve(request.getCoordinates(), user);
+        checkCoordinatesAvailable(coordinates.getId(), id);
+        var governor = humanService.resolve(request.getGovernor(), user);
+        checkGovernorAvailable(governor.getId(), id);
+        existing.setCoordinates(coordinates);
+        existing.setGovernor(governor);
         City updated = cityRepository.update(existing);
         updateNotifier.notify("cities");
         updateNotifier.notify("coordinates");
@@ -100,6 +109,24 @@ public class CityService {
         checkModifyAccess(city.getCreatedBy(), user);
         cityRepository.delete(city);
         updateNotifier.notify("cities");
+    }
+
+    private void checkCoordinatesAvailable(Integer coordinatesId, Integer excludedCityId)
+            throws UniqueViolationException {
+        boolean busy = cityRepository.findByCoordinates(coordinatesId).stream()
+                .anyMatch(c -> !c.getId().equals(excludedCityId));
+        if (busy) {
+            throw new UniqueViolationException("Координаты уже привязаны к другому городу");
+        }
+    }
+
+    private void checkGovernorAvailable(Integer governorId, Integer excludedCityId)
+            throws UniqueViolationException {
+        boolean busy = cityRepository.findByGovernor(governorId).stream()
+                .anyMatch(c -> !c.getId().equals(excludedCityId));
+        if (busy) {
+            throw new UniqueViolationException("Губернатор уже назначен другому городу");
+        }
     }
 
     private void checkModifyAccess(User owner, User current) throws AccessDeniedException {

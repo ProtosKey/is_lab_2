@@ -91,7 +91,7 @@ public class CoordinatesService {
 
     @Transactional(rollbackOn = Exception.class)
     public void delete(Integer id, User user, Integer replacementId)
-            throws EntityNotFoundException, AccessDeniedException, ReplacementRequiredException, SameObjectException {
+            throws EntityNotFoundException, AccessDeniedException, ReplacementRequiredException, SameObjectException, UniqueViolationException {
         Coordinates target = findOwned(id, user);
         List<City> linked = cityRepository.findByCoordinates(id);
 
@@ -103,6 +103,9 @@ public class CoordinatesService {
                 throw new SameObjectException("Нельзя заменить объект им же самим");
             }
             Coordinates replacement = find(replacementId);
+            if (!cityRepository.findByCoordinates(replacementId).isEmpty()) {
+                throw new UniqueViolationException("Выбранные координаты уже привязаны к другому городу");
+            }
             linked.forEach(city -> city.setCoordinates(replacement));
         }
 

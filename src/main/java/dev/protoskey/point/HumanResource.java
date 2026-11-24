@@ -95,7 +95,7 @@ public class HumanResource {
                            @QueryParam("replacement") Integer replacementId,
                            @Context ContainerRequestContext context)
             throws EntityNotFoundException, AccessDeniedException, ReplacementRequiredException,
-            SameObjectException {
+            SameObjectException, UniqueViolationException {
         User user = AuthFilter.currentUser(context);
         humanService.delete(id, user, replacementId);
         return Response.noContent().build();

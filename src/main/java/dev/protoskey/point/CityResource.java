@@ -5,6 +5,7 @@ import dev.protoskey.entity.User;
 import dev.protoskey.exception.AccessDeniedException;
 import dev.protoskey.exception.EntityNotFoundException;
 import dev.protoskey.exception.MapperException;
+import dev.protoskey.exception.UniqueViolationException;
 import dev.protoskey.exception.ValidatorException;
 import dev.protoskey.mapper.CityDtoMapper;
 import dev.protoskey.model.CityDto;
@@ -68,7 +69,7 @@ public class CityResource {
 
     @POST
     public Response create(CityRequest request, @Context ContainerRequestContext context)
-            throws ValidatorException, EntityNotFoundException, MapperException {
+            throws ValidatorException, EntityNotFoundException, UniqueViolationException, MapperException {
         User user = AuthFilter.currentUser(context);
         City city = cityService.create(request, user);
         return Response.status(Response.Status.CREATED)
@@ -80,7 +81,7 @@ public class CityResource {
     @Path("/{id}")
     public CityDto update(@PathParam("id") Integer id, CityRequest request,
                           @Context ContainerRequestContext context)
-            throws ValidatorException, EntityNotFoundException, AccessDeniedException, MapperException {
+            throws ValidatorException, EntityNotFoundException, AccessDeniedException, UniqueViolationException, MapperException {
         User user = AuthFilter.currentUser(context);
         return cityDtoMapper.parseFrom(cityService.update(id, request, user));
     }

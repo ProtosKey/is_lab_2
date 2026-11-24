@@ -134,8 +134,12 @@ public class ImportService {
     private Coordinates linkOrImportCoordinates(CoordinatesRef ref, User user, AtomicInteger created)
             throws EntityNotFoundException, UniqueViolationException, MapperException {
         if (ref.getId() != null) {
-            return coordinatesRepository.findById(ref.getId())
+            Coordinates coordinates = coordinatesRepository.findById(ref.getId())
                     .orElseThrow(() -> new EntityNotFoundException("Координаты", ref.getId()));
+            if (!cityRepository.findByCoordinates(coordinates.getId()).isEmpty()) {
+                throw new UniqueViolationException("Координаты уже привязаны к другому городу");
+            }
+            return coordinates;
         }
         Optional<Coordinates> existing =
                 coordinatesRepository.findByCoordinates(ref.getX(), ref.getY());
@@ -153,8 +157,12 @@ public class ImportService {
     private Human linkOrImportGovernor(HumanRef ref, User user, AtomicInteger created)
             throws EntityNotFoundException, UniqueViolationException, MapperException {
         if (ref.getId() != null) {
-            return humanRepository.findById(ref.getId())
+            Human human = humanRepository.findById(ref.getId())
                     .orElseThrow(() -> new EntityNotFoundException("Губернатор", ref.getId()));
+            if (!cityRepository.findByGovernor(human.getId()).isEmpty()) {
+                throw new UniqueViolationException("Губернатор уже назначен другому городу");
+            }
+            return human;
         }
         Optional<Human> existing = humanRepository.findByName(ref.getName());
         if (existing.isPresent()) {

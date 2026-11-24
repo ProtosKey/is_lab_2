@@ -93,7 +93,7 @@ public class HumanService {
 
     @Transactional(rollbackOn = Exception.class)
     public void delete(Integer id, User user, Integer replacementId)
-            throws EntityNotFoundException, AccessDeniedException, ReplacementRequiredException, SameObjectException {
+            throws EntityNotFoundException, AccessDeniedException, ReplacementRequiredException, SameObjectException, UniqueViolationException {
         Human target = findOwned(id, user);
         List<City> linked = cityRepository.findByGovernor(id);
 
@@ -105,6 +105,9 @@ public class HumanService {
                 throw new SameObjectException("Нельзя заменить объект им же самим");
             }
             Human replacement = find(replacementId);
+            if (!cityRepository.findByGovernor(replacementId).isEmpty()) {
+                throw new UniqueViolationException("Выбранный губернатор уже назначен другому городу");
+            }
             linked.forEach(city -> city.setGovernor(replacement));
         }
 
