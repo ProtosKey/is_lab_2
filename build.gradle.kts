@@ -26,6 +26,11 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 }
 
+// Работает только у меня
+tasks.war {
+    from("../is_lab_2_ui/build")
+}
+
 tasks.test {
     useJUnitPlatform()
 }
