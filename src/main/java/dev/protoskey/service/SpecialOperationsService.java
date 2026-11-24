@@ -18,12 +18,8 @@ import java.util.List;
 
 @ApplicationScoped
 public class SpecialOperationsService {
-    private final CityRepository cityRepository;
-
     @Inject
-    public SpecialOperationsService(CityRepository cityRepository) {
-        this.cityRepository = cityRepository;
-    }
+    private CityRepository cityRepository;
 
     @Transactional(rollbackOn = Exception.class)
     public City deleteOneByClimate(Climate climate, User user)

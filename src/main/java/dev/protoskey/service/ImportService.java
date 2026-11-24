@@ -27,6 +27,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @ApplicationScoped
 public class ImportService {
@@ -59,13 +60,13 @@ public class ImportService {
             throws ValidatorException, EntityNotFoundException, UniqueViolationException, MapperException {
         validator.validate(batch);
 
-        int created = 0;
-        created += importCoordinates(batch.getCoordinates(), user);
-        created += importGovernors(batch.getGovernors(), user);
-        created += importCities(batch.getCities(), user);
+        AtomicInteger created = new AtomicInteger();
+        created.addAndGet(importCoordinates(batch.getCoordinates(), user));
+        created.addAndGet(importGovernors(batch.getGovernors(), user));
+        importCities(batch.getCities(), user, created);
 
-        operationService.recordSuccess(user, OperationType.IMPORT, created, fileName);
-        return created;
+        operationService.recordSuccess(user, OperationType.IMPORT, created.get(), fileName);
+        return created.get();
     }
 
     private int importCoordinates(List<CoordinatesRequest> coordinates, User user)
@@ -108,24 +109,23 @@ public class ImportService {
         return created;
     }
 
-    private int importCities(List<ImportCityDto> cities, User user)
+    private int importCities(List<ImportCityDto> cities, User user, AtomicInteger created)
             throws EntityNotFoundException, UniqueViolationException, MapperException {
         if (cities == null) {
             return 0;
         }
-        int created = 0;
         for (ImportCityDto dto : cities) {
             City city = cityMapper.parseTo(dto);
-            city.setCoordinates(linkOrImportCoordinates(dto.getCoordinates(), user));
-            city.setGovernor(linkOrImportGovernor(dto.getGovernor(), user));
+            city.setCoordinates(linkOrImportCoordinates(dto.getCoordinates(), user, created));
+            city.setGovernor(linkOrImportGovernor(dto.getGovernor(), user, created));
             city.setCreatedBy(user);
             cityRepository.save(city);
-            created++;
+            created.incrementAndGet();
         }
-        return created;
+        return created.get();
     }
 
-    private Coordinates linkOrImportCoordinates(CoordinatesRef ref, User user)
+    private Coordinates linkOrImportCoordinates(CoordinatesRef ref, User user, AtomicInteger created)
             throws EntityNotFoundException, UniqueViolationException, MapperException {
         if (ref.getId() != null) {
             return coordinatesRepository.findById(ref.getId())
@@ -140,10 +140,11 @@ public class ImportService {
         Coordinates coordinates = coordinatesMapper.parseTo(toRequest(ref));
         coordinates.setCreatedBy(user);
         coordinatesRepository.save(coordinates);
+        created.incrementAndGet();
         return coordinates;
     }
 
-    private Human linkOrImportGovernor(HumanRef ref, User user)
+    private Human linkOrImportGovernor(HumanRef ref, User user, AtomicInteger created)
             throws EntityNotFoundException, UniqueViolationException, MapperException {
         if (ref.getId() != null) {
             return humanRepository.findById(ref.getId())
@@ -156,6 +157,7 @@ public class ImportService {
         Human human = humanMapper.parseTo(toRequest(ref));
         human.setCreatedBy(user);
         humanRepository.save(human);
+        created.incrementAndGet();
         return human;
     }
 

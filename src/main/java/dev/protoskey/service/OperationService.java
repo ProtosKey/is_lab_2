@@ -43,4 +43,10 @@ public class OperationService {
     private User refresh(User user) {
         return userRepository.findById(user.getId()).orElse(user);
     }
+
+    public java.util.List<Operation> historyFor(User user) {
+        return user.getUserLevel() == dev.protoskey.entity.UserLevel.ADMIN
+                ? operationRepository.findAll()
+                : operationRepository.findAllByUser(user.getId());
+    }
 }
