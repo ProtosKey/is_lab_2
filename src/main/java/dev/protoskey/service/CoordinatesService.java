@@ -37,6 +37,9 @@ public class CoordinatesService {
     @Inject
     private CoordinatesRequestMapper mapper;
 
+    @Inject
+    private UpdateNotifier updateNotifier;
+
     public List<Coordinates> findAll() {
         return coordinatesRepository.findAll();
     }
@@ -67,7 +70,9 @@ public class CoordinatesService {
 
         Coordinates coordinates = mapper.parseTo(request);
         coordinates.setCreatedBy(user);
-        return coordinatesRepository.save(coordinates);
+        Coordinates saved = coordinatesRepository.save(coordinates);
+        updateNotifier.notify("coordinates");
+        return saved;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -79,7 +84,9 @@ public class CoordinatesService {
 
         existing.setX(request.getX());
         existing.setY(request.getY());
-        return coordinatesRepository.update(existing);
+        Coordinates updated = coordinatesRepository.update(existing);
+        updateNotifier.notify("coordinates");
+        return updated;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -100,6 +107,10 @@ public class CoordinatesService {
         }
 
         coordinatesRepository.delete(target);
+        updateNotifier.notify("coordinates");
+        if (!linked.isEmpty()) {
+            updateNotifier.notify("cities");
+        }
     }
 
     public Coordinates resolve(CoordinatesRef ref, User user) throws EntityNotFoundException, MapperException {

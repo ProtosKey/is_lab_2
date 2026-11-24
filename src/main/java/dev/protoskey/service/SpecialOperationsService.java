@@ -21,6 +21,9 @@ public class SpecialOperationsService {
     @Inject
     private CityRepository cityRepository;
 
+    @Inject
+    private UpdateNotifier updateNotifier;
+
     @Transactional(rollbackOn = Exception.class)
     public City deleteOneByClimate(Climate climate, User user)
             throws AccessDeniedException, NoCityWithClimateException {
@@ -29,6 +32,7 @@ public class SpecialOperationsService {
         City city = cityRepository.findAnyByClimate(climate)
                 .orElseThrow(() -> new NoCityWithClimateException(climate));
         cityRepository.delete(city);
+        updateNotifier.notify("cities");
         return city;
     }
 

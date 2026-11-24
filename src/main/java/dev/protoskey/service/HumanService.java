@@ -37,6 +37,9 @@ public class HumanService {
     @Inject
     private HumanRequestMapper mapper;
 
+    @Inject
+    private UpdateNotifier updateNotifier;
+
     public List<Human> findAll() {
         return humanRepository.findAll();
     }
@@ -67,7 +70,9 @@ public class HumanService {
 
         Human human = mapper.parseTo(request);
         human.setCreatedBy(user);
-        return humanRepository.save(human);
+        Human saved = humanRepository.save(human);
+        updateNotifier.notify("governors");
+        return saved;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -81,7 +86,9 @@ public class HumanService {
         existing.setName(changes.getName());
         existing.setAge(changes.getAge());
         existing.setBirthday(changes.getBirthday());
-        return humanRepository.update(existing);
+        Human updated = humanRepository.update(existing);
+        updateNotifier.notify("governors");
+        return updated;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -102,6 +109,10 @@ public class HumanService {
         }
 
         humanRepository.delete(target);
+        updateNotifier.notify("governors");
+        if (!linked.isEmpty()) {
+            updateNotifier.notify("cities");
+        }
     }
 
     /**

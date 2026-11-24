@@ -29,6 +29,9 @@ public class CityService {
     private HumanService humanService;
 
     @Inject
+    private UpdateNotifier updateNotifier;
+
+    @Inject
     private CityRequestValidator validator;
 
     @Inject
@@ -56,7 +59,11 @@ public class CityService {
         city.setCoordinates(coordinatesService.resolve(request.getCoordinates(), user));
         city.setGovernor(humanService.resolve(request.getGovernor(), user));
         city.setCreatedBy(user);
-        return cityRepository.save(city);
+        City saved = cityRepository.save(city);
+        updateNotifier.notify("cities");
+        updateNotifier.notify("coordinates");
+        updateNotifier.notify("governors");
+        return saved;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -79,7 +86,11 @@ public class CityService {
         existing.setStandardOfLiving(changes.getStandardOfLiving());
         existing.setCoordinates(coordinatesService.resolve(request.getCoordinates(), user));
         existing.setGovernor(humanService.resolve(request.getGovernor(), user));
-        return cityRepository.update(existing);
+        City updated = cityRepository.update(existing);
+        updateNotifier.notify("cities");
+        updateNotifier.notify("coordinates");
+        updateNotifier.notify("governors");
+        return updated;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -88,6 +99,7 @@ public class CityService {
         City city = find(id);
         checkModifyAccess(city.getCreatedBy(), user);
         cityRepository.delete(city);
+        updateNotifier.notify("cities");
     }
 
     private void checkModifyAccess(User owner, User current) throws AccessDeniedException {

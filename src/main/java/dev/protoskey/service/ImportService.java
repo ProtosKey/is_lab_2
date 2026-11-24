@@ -53,6 +53,9 @@ public class ImportService {
     private CityRepository cityRepository;
 
     @Inject
+    private UpdateNotifier updateNotifier;
+
+    @Inject
     private OperationService operationService;
 
     @Transactional(rollbackOn = Exception.class)
@@ -87,6 +90,9 @@ public class ImportService {
             coordinatesRepository.save(entity);
             created++;
         }
+        updateNotifier.notify("cities");
+        updateNotifier.notify("coordinates");
+        updateNotifier.notify("governors");
         return created;
     }
 

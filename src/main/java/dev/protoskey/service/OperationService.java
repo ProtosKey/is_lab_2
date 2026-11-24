@@ -18,6 +18,9 @@ public class OperationService {
     @Inject
     private UserRepository userRepository;
 
+    @Inject
+    private UpdateNotifier updateNotifier;
+
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = Exception.class)
     public void recordSuccess(User user, OperationType type, int objectCount, String fileName) {
         Operation operation = new Operation();
@@ -27,6 +30,7 @@ public class OperationService {
         operation.setObjectCount(objectCount);
         operation.setFileName(fileName);
         operationRepository.save(operation);
+        updateNotifier.notify("operations");
     }
 
     @Transactional(value = Transactional.TxType.REQUIRES_NEW, rollbackOn = Exception.class)
@@ -38,6 +42,7 @@ public class OperationService {
         operation.setMessage(message);
         operation.setFileName(fileName);
         operationRepository.save(operation);
+        updateNotifier.notify("operations");
     }
 
     private User refresh(User user) {
