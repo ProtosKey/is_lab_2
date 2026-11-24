@@ -59,6 +59,13 @@ public class CoordinatesResource {
         return coordinatesDtoMapper.parseFrom(coordinatesService.find(id));
     }
 
+    @GET
+    @Path("/{id}/usage")
+    public java.util.Map<String, Integer> usage(@PathParam("id") Integer id)
+            throws EntityNotFoundException {
+        return java.util.Map.of("count", coordinatesService.countLinkedCities(id));
+    }
+
     @POST
     public CoordinatesDto create(CoordinatesRequest request, @Context ContainerRequestContext context)
             throws ValidatorException, UniqueViolationException, MapperException {

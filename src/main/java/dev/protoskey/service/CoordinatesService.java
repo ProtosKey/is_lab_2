@@ -49,6 +49,11 @@ public class CoordinatesService {
         return coordinatesRepository.count();
     }
 
+    public int countLinkedCities(Integer id) throws EntityNotFoundException {
+        find(id);
+        return cityRepository.findByCoordinates(id).size();
+    }
+
     public Coordinates find(Integer id) throws EntityNotFoundException {
         return coordinatesRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Координаты", id));

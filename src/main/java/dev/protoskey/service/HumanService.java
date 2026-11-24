@@ -49,6 +49,11 @@ public class HumanService {
         return humanRepository.count();
     }
 
+    public int countLinkedCities(Integer id) throws EntityNotFoundException {
+        find(id);
+        return cityRepository.findByGovernor(id).size();
+    }
+
     public Human find(Integer id) throws EntityNotFoundException {
         return humanRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Губернатор", id));

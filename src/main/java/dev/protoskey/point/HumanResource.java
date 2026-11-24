@@ -60,6 +60,13 @@ public class HumanResource {
         return humanDtoMapper.parseFrom(humanService.find(id));
     }
 
+    @GET
+    @Path("/{id}/usage")
+    public java.util.Map<String, Integer> usage(@PathParam("id") Integer id)
+            throws EntityNotFoundException {
+        return java.util.Map.of("count", humanService.countLinkedCities(id));
+    }
+
     @POST
     public HumanDto create(HumanRequest request, @Context ContainerRequestContext context)
             throws ValidatorException, UniqueViolationException, MapperException {
