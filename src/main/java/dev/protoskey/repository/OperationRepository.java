@@ -32,22 +32,31 @@ public class OperationRepository implements Repository<Operation> {
                 .getResultList();
     }
 
-    public List<Operation> findPage(int offset, int limit) {
-        return entityManager.createQuery(
-                        "select o from Operation o order by o.createdAt desc, o.id desc", Operation.class)
-                .setFirstResult(Math.max(0, offset))
-                .setMaxResults(Math.max(1, limit))
-                .getResultList();
+    public List<Operation> findPage(Integer cursor, int limit) {
+        Operation anchor = cursor != null ? entityManager.find(Operation.class, cursor) : null;
+        String jpql = anchor == null
+                ? "select o from Operation o order by o.createdAt desc, o.id desc"
+                : "select o from Operation o where (o.createdAt < :cursorTime or (o.createdAt = :cursorTime and o.id < :cursorId)) order by o.createdAt desc, o.id desc";
+        var query = entityManager.createQuery(jpql, Operation.class);
+        if (anchor != null) {
+            query.setParameter("cursorTime", anchor.getCreatedAt());
+            query.setParameter("cursorId", anchor.getId());
+        }
+        return query.setMaxResults(Math.max(1, limit) + 1).getResultList();
     }
 
-    public List<Operation> findPageByUser(Integer userId, int offset, int limit) {
-        return entityManager.createQuery(
-                        "select o from Operation o where o.user.id = :userId order by o.createdAt desc, o.id desc",
-                        Operation.class)
-                .setParameter("userId", userId)
-                .setFirstResult(Math.max(0, offset))
-                .setMaxResults(Math.max(1, limit))
-                .getResultList();
+    public List<Operation> findPageByUser(Integer userId, Integer cursor, int limit) {
+        Operation anchor = cursor != null ? entityManager.find(Operation.class, cursor) : null;
+        String jpql = anchor == null
+                ? "select o from Operation o where o.user.id = :userId order by o.createdAt desc, o.id desc"
+                : "select o from Operation o where o.user.id = :userId and (o.createdAt < :cursorTime or (o.createdAt = :cursorTime and o.id < :cursorId)) order by o.createdAt desc, o.id desc";
+        var query = entityManager.createQuery(jpql, Operation.class)
+                .setParameter("userId", userId);
+        if (anchor != null) {
+            query.setParameter("cursorTime", anchor.getCreatedAt());
+            query.setParameter("cursorId", anchor.getId());
+        }
+        return query.setMaxResults(Math.max(1, limit) + 1).getResultList();
     }
 
     public long countAll() {

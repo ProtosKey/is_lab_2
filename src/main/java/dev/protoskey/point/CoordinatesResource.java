@@ -42,14 +42,19 @@ public class CoordinatesResource {
     private CoordinatesDtoMapper coordinatesDtoMapper;
 
     @GET
-    public PageDto<CoordinatesDto> findPage(@QueryParam("offset") @DefaultValue("0") int offset,
+    public PageDto<CoordinatesDto> findPage(@QueryParam("cursor") Integer cursor,
                                             @QueryParam("limit") @DefaultValue("10") int limit)
             throws MapperException {
+        int pageSize = Math.max(1, limit);
+        List<Coordinates> rows = coordinatesService.findPage(cursor, pageSize);
+        boolean hasMore = rows.size() > pageSize;
+        List<Coordinates> pageRows = hasMore ? rows.subList(0, pageSize) : rows;
         List<CoordinatesDto> items = new java.util.ArrayList<>();
-        for (Coordinates coordinates : coordinatesService.findPage(offset, limit)) {
+        for (Coordinates coordinates : pageRows) {
             items.add(coordinatesDtoMapper.parseFrom(coordinates));
         }
-        return new PageDto<>(items, coordinatesService.count());
+        String nextCursor = hasMore && !items.isEmpty() ? String.valueOf(items.get(items.size() - 1).getId()) : null;
+        return new PageDto<>(items, coordinatesService.count(), nextCursor, hasMore);
     }
 
     @GET

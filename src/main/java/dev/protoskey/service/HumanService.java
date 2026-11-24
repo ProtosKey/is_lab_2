@@ -44,8 +44,8 @@ public class HumanService {
         return humanRepository.findAll();
     }
 
-    public List<Human> findPage(int offset, int limit) {
-        return humanRepository.findPage(offset, limit);
+    public List<Human> findPage(Integer cursor, int limit) {
+        return humanRepository.findPage(cursor, limit);
     }
 
     public long count() {

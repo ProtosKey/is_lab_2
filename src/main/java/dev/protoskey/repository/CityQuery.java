@@ -4,6 +4,6 @@ public record CityQuery(String filterField,
                         String filterValue,
                         String sortField,
                         boolean ascending,
-                        int offset,
+                        Integer cursor,
                         int limit) {
 }

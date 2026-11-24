@@ -44,8 +44,8 @@ public class CoordinatesService {
         return coordinatesRepository.findAll();
     }
 
-    public List<Coordinates> findPage(int offset, int limit) {
-        return coordinatesRepository.findPage(offset, limit);
+    public List<Coordinates> findPage(Integer cursor, int limit) {
+        return coordinatesRepository.findPage(cursor, limit);
     }
 
     public long count() {

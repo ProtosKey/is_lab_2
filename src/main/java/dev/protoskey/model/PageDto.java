@@ -13,4 +13,6 @@ import java.util.List;
 public class PageDto<T> {
     private List<T> items;
     private long totalCount;
+    private String nextCursor;
+    private boolean hasMore;
 }

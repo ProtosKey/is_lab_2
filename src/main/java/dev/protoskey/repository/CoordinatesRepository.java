@@ -21,11 +21,15 @@ public class CoordinatesRepository implements Repository<Coordinates> {
                 .getResultList();
     }
 
-    public List<Coordinates> findPage(int offset, int limit) {
-        return entityManager.createQuery("select c from Coordinates c order by c.id", Coordinates.class)
-                .setFirstResult(Math.max(0, offset))
-                .setMaxResults(Math.max(1, limit))
-                .getResultList();
+    public List<Coordinates> findPage(Integer cursor, int limit) {
+        String jpql = cursor == null
+                ? "select c from Coordinates c order by c.id asc"
+                : "select c from Coordinates c where c.id > :cursor order by c.id asc";
+        var query = entityManager.createQuery(jpql, Coordinates.class);
+        if (cursor != null) {
+            query.setParameter("cursor", cursor);
+        }
+        return query.setMaxResults(Math.max(1, limit) + 1).getResultList();
     }
 
     public long count() {

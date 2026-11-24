@@ -28,15 +28,20 @@ public class OperationResource {
     private OperationDtoMapper operationDtoMapper;
 
     @GET
-    public PageDto<OperationDto> history(@QueryParam("offset") @DefaultValue("0") int offset,
+    public PageDto<OperationDto> history(@QueryParam("cursor") Integer cursor,
                                          @QueryParam("limit") @DefaultValue("10") int limit,
                                          @Context ContainerRequestContext context)
             throws MapperException {
         User user = AuthFilter.currentUser(context);
+        int pageSize = Math.max(1, limit);
+        List<Operation> rows = operationService.historyPageFor(user, cursor, pageSize);
+        boolean hasMore = rows.size() > pageSize;
+        List<Operation> pageRows = hasMore ? rows.subList(0, pageSize) : rows;
         List<OperationDto> items = new ArrayList<>();
-        for (Operation operation : operationService.historyPageFor(user, offset, limit)) {
+        for (Operation operation : pageRows) {
             items.add(operationDtoMapper.parseFrom(operation));
         }
-        return new PageDto<>(items, operationService.countFor(user));
+        String nextCursor = hasMore && !items.isEmpty() ? String.valueOf(items.get(items.size() - 1).getId()) : null;
+        return new PageDto<>(items, operationService.countFor(user), nextCursor, hasMore);
     }
 }

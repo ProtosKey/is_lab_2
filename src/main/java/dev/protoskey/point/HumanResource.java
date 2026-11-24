@@ -43,14 +43,19 @@ public class HumanResource {
     private HumanDtoMapper humanDtoMapper;
 
     @GET
-    public PageDto<HumanDto> findPage(@QueryParam("offset") @DefaultValue("0") int offset,
+    public PageDto<HumanDto> findPage(@QueryParam("cursor") Integer cursor,
                                       @QueryParam("limit") @DefaultValue("10") int limit)
             throws MapperException {
+        int pageSize = Math.max(1, limit);
+        List<Human> rows = humanService.findPage(cursor, pageSize);
+        boolean hasMore = rows.size() > pageSize;
+        List<Human> pageRows = hasMore ? rows.subList(0, pageSize) : rows;
         List<HumanDto> items = new ArrayList<>();
-        for (Human human : humanService.findPage(offset, limit)) {
+        for (Human human : pageRows) {
             items.add(humanDtoMapper.parseFrom(human));
         }
-        return new PageDto<>(items, humanService.count());
+        String nextCursor = hasMore && !items.isEmpty() ? String.valueOf(items.get(items.size() - 1).getId()) : null;
+        return new PageDto<>(items, humanService.count(), nextCursor, hasMore);
     }
 
     @GET

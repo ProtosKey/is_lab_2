@@ -55,10 +55,10 @@ public class OperationService {
                 : operationRepository.findAllByUser(user.getId());
     }
 
-    public java.util.List<Operation> historyPageFor(User user, int offset, int limit) {
+    public java.util.List<Operation> historyPageFor(User user, Integer cursor, int limit) {
         return user.getUserLevel() == dev.protoskey.entity.UserLevel.ADMIN
-                ? operationRepository.findPage(offset, limit)
-                : operationRepository.findPageByUser(user.getId(), offset, limit);
+                ? operationRepository.findPage(cursor, limit)
+                : operationRepository.findPageByUser(user.getId(), cursor, limit);
     }
 
     public long countFor(User user) {

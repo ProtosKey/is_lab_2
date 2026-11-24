@@ -44,15 +44,20 @@ public class CityResource {
                                      @QueryParam("filterValue") String filterValue,
                                      @QueryParam("sortField") String sortField,
                                      @QueryParam("ascending") @DefaultValue("true") boolean ascending,
-                                     @QueryParam("offset") @DefaultValue("0") int offset,
+                                     @QueryParam("cursor") Integer cursor,
                                      @QueryParam("limit") @DefaultValue("10") int limit)
             throws MapperException {
-        CityQuery query = new CityQuery(filterField, filterValue, sortField, ascending, offset, limit);
+        int pageSize = Math.max(1, limit);
+        CityQuery query = new CityQuery(filterField, filterValue, sortField, ascending, cursor, pageSize);
+        List<City> rows = cityService.findPage(query);
+        boolean hasMore = rows.size() > pageSize;
+        List<City> pageRows = hasMore ? rows.subList(0, pageSize) : rows;
         List<CityDto> items = new ArrayList<>();
-        for (City city : cityService.findPage(query)) {
+        for (City city : pageRows) {
             items.add(cityDtoMapper.parseFrom(city));
         }
-        return new PageDto<>(items, cityService.count(query));
+        String nextCursor = hasMore && !items.isEmpty() ? String.valueOf(items.get(items.size() - 1).getId()) : null;
+        return new PageDto<>(items, cityService.count(query), nextCursor, hasMore);
     }
 
     @GET

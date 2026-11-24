@@ -20,11 +20,15 @@ public class HumanRepository implements Repository<Human> {
         return entityManager.createQuery("select h from Human h order by h.id", Human.class).getResultList();
     }
 
-    public List<Human> findPage(int offset, int limit) {
-        return entityManager.createQuery("select h from Human h order by h.id", Human.class)
-                .setFirstResult(Math.max(0, offset))
-                .setMaxResults(Math.max(1, limit))
-                .getResultList();
+    public List<Human> findPage(Integer cursor, int limit) {
+        String jpql = cursor == null
+                ? "select h from Human h order by h.id asc"
+                : "select h from Human h where h.id > :cursor order by h.id asc";
+        var query = entityManager.createQuery(jpql, Human.class);
+        if (cursor != null) {
+            query.setParameter("cursor", cursor);
+        }
+        return query.setMaxResults(Math.max(1, limit) + 1).getResultList();
     }
 
     public long count() {
