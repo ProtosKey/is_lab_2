@@ -242,6 +242,12 @@ public class CityRepository implements Repository<City> {
                 ? Climate.values()
                 : StandardOfLiving.values();
         String part = query.filterValue().toLowerCase();
+        List<? extends Enum<?>> exact = Arrays.stream(values)
+                .filter(value -> value.name().equalsIgnoreCase(part))
+                .toList();
+        if (!exact.isEmpty()) {
+            return exact;
+        }
         return Arrays.stream(values)
                 .filter(value -> value.name().toLowerCase().contains(part))
                 .toList();
