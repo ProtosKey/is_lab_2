@@ -66,8 +66,6 @@ public class HumanService {
     public Human create(HumanRequest request, User user)
             throws ValidatorException, UniqueViolationException, MapperException {
         validator.validate(request);
-        checkUnique(request.getName(), null);
-
         Human human = mapper.parseTo(request);
         human.setCreatedBy(user);
         Human saved = humanRepository.save(human);
@@ -80,8 +78,6 @@ public class HumanService {
             throws EntityNotFoundException, AccessDeniedException, ValidatorException, UniqueViolationException, MapperException {
         Human existing = findOwned(id, user);
         validator.validate(request);
-        checkUnique(request.getName(), id);
-
         Human changes = mapper.parseTo(request);
         existing.setName(changes.getName());
         existing.setAge(changes.getAge());
@@ -126,10 +122,6 @@ public class HumanService {
     public Human resolve(HumanRef ref, User user) throws EntityNotFoundException, MapperException {
         if (ref.getId() != null) {
             return find(ref.getId());
-        }
-        Optional<Human> existing = humanRepository.findByName(ref.getName());
-        if (existing.isPresent()) {
-            return existing.get();
         }
         Human human = mapper.parseTo(toRequest(ref));
         human.setCreatedBy(user);

@@ -103,10 +103,6 @@ public class ImportService {
         }
         int created = 0;
         for (HumanRequest request : governors) {
-            Optional<Human> existing = humanRepository.findByName(request.getName());
-            if (existing.isPresent()) {
-                throw new UniqueViolationException("Губернатор \"" + request.getName() + "\" уже существует");
-            }
             Human entity = humanMapper.parseTo(request);
             entity.setCreatedBy(user);
             humanRepository.save(entity);
@@ -163,10 +159,6 @@ public class ImportService {
                 throw new UniqueViolationException("Губернатор уже назначен другому городу");
             }
             return human;
-        }
-        Optional<Human> existing = humanRepository.findByName(ref.getName());
-        if (existing.isPresent()) {
-            throw new UniqueViolationException("Губернатор \"" + ref.getName() + "\" уже существует");
         }
         Human human = humanMapper.parseTo(toRequest(ref));
         human.setCreatedBy(user);

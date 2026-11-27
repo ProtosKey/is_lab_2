@@ -4,6 +4,7 @@ import dev.protoskey.exception.ValidatorException;
 import dev.protoskey.model.HumanRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -19,6 +20,7 @@ public class HumanRequestValidator implements Validator<HumanRequest> {
         validateName(request.getName());
         validateAge(request.getAge());
         validateBirthday(request.getBirthday());
+        validateAgeMatchesBirthday(request.getAge(), request.getBirthday());
     }
 
     public void validateName(String name) throws ValidatorException {
@@ -45,6 +47,17 @@ public class HumanRequestValidator implements Validator<HumanRequest> {
             }
         } catch (DateTimeParseException e) {
             throw new ValidatorException("Неверный формат даты рождения. Ожидается формат yyyy-MM-dd");
+        }
+    }
+
+    public void validateAgeMatchesBirthday(Long age, String birthday) throws ValidatorException {
+        if (birthday == null || birthday.isBlank() || age == null) {
+            return;
+        }
+        LocalDate birthDate = LocalDate.parse(birthday, FORMATTER);
+        long expected = Period.between(birthDate, LocalDate.now()).getYears();
+        if (age != expected) {
+            throw new ValidatorException("Возраст не соответствует дате рождения (ожидается " + expected + ")");
         }
     }
 }

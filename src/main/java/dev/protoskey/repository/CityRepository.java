@@ -25,7 +25,6 @@ public class CityRepository implements Repository<City> {
         return entityManager.createQuery("select c from City c order by c.id", City.class).getResultList();
     }
 
-    @SuppressWarnings("SqlSourceToSinkFlow")
     public List<City> findPage(CityQuery query) {
         City anchor = query.cursor() != null ? entityManager.find(City.class, query.cursor()) : null;
         String jpql = "select c from City c" + buildWhere(query, anchor) + orderClause(query);
@@ -37,7 +36,6 @@ public class CityRepository implements Repository<City> {
                 .getResultList();
     }
 
-    @SuppressWarnings("SqlSourceToSinkFlow")
     public long countAll(CityQuery query) {
         String jpql = "select count(c) from City c" + filterWhere(query);
         TypedQuery<Long> typedQuery = entityManager.createQuery(jpql, Long.class);
