@@ -33,6 +33,9 @@ public class CityService {
     private UpdateNotifier updateNotifier;
 
     @Inject
+    private TransactionIsolation transactionIsolation;
+
+    @Inject
     private CityRequestValidator validator;
 
     @Inject
@@ -54,6 +57,7 @@ public class CityService {
     @Transactional(rollbackOn = Exception.class)
     public City create(CityRequest request, User user)
             throws ValidatorException, EntityNotFoundException, UniqueViolationException, MapperException {
+        transactionIsolation.serializable();
         validator.validate(request);
 
         City city = mapper.parseTo(request);
@@ -74,6 +78,7 @@ public class CityService {
     @Transactional(rollbackOn = Exception.class)
     public City update(Integer id, CityRequest request, User user)
             throws ValidatorException, EntityNotFoundException, AccessDeniedException, UniqueViolationException, MapperException {
+        transactionIsolation.serializable();
         validator.validate(request);
 
         City existing = find(id);
@@ -105,6 +110,7 @@ public class CityService {
     @Transactional(rollbackOn = Exception.class)
     public void delete(Integer id, User user)
             throws EntityNotFoundException, AccessDeniedException {
+        transactionIsolation.serializable();
         City city = find(id);
         checkModifyAccess(city.getCreatedBy(), user);
         cityRepository.delete(city);

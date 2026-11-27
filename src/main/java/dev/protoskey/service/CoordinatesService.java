@@ -38,6 +38,9 @@ public class CoordinatesService {
     private CoordinatesRequestMapper mapper;
 
     @Inject
+    private TransactionIsolation transactionIsolation;
+
+    @Inject
     private UpdateNotifier updateNotifier;
 
     public List<Coordinates> findAll() {
@@ -65,6 +68,7 @@ public class CoordinatesService {
     @Transactional(rollbackOn = Exception.class)
     public Coordinates create(CoordinatesRequest request, User user)
             throws ValidatorException, UniqueViolationException, MapperException {
+        transactionIsolation.serializable();
         validator.validate(request);
         checkUnique(request.getX(), request.getY(), null);
 
@@ -78,6 +82,7 @@ public class CoordinatesService {
     @Transactional(rollbackOn = Exception.class)
     public Coordinates update(Integer id, CoordinatesRequest request, User user)
             throws EntityNotFoundException, AccessDeniedException, ValidatorException, UniqueViolationException, MapperException {
+        transactionIsolation.serializable();
         Coordinates existing = findOwned(id, user);
         validator.validate(request);
         checkUnique(request.getX(), request.getY(), id);
@@ -92,6 +97,7 @@ public class CoordinatesService {
     @Transactional(rollbackOn = Exception.class)
     public void delete(Integer id, User user, Integer replacementId)
             throws EntityNotFoundException, AccessDeniedException, ReplacementRequiredException, SameObjectException, UniqueViolationException {
+        transactionIsolation.serializable();
         Coordinates target = findOwned(id, user);
         List<City> linked = cityRepository.findByCoordinates(id);
 

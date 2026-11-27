@@ -53,6 +53,9 @@ public class ImportService {
     private CityRepository cityRepository;
 
     @Inject
+    private TransactionIsolation transactionIsolation;
+
+    @Inject
     private UpdateNotifier updateNotifier;
 
     @Inject
@@ -61,6 +64,7 @@ public class ImportService {
     @Transactional(rollbackOn = Exception.class)
     public int importBatch(ImportBatchDto batch, User user, String fileName)
             throws ValidatorException, EntityNotFoundException, UniqueViolationException, MapperException {
+        transactionIsolation.serializable();
         validator.validate(batch);
 
         AtomicInteger created = new AtomicInteger();
